@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nmu-hub.hulinks.replit.app/sitemap.xml
