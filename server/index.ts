@@ -16,6 +16,7 @@ declare module "http" {
 
 app.use(compression());
 
+// 🔥 RATE LIMITERS
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
@@ -44,6 +45,7 @@ app.use("/api/research", aiLimiter);
 app.use("/api/extract-text", aiLimiter);
 app.use("/api/calculator", aiLimiter);
 
+// 🔥 BODY PARSING
 app.use(
   express.json({
     verify: (req, _res, buf) => {
@@ -54,6 +56,7 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+// 🔥 LOGGER
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -94,6 +97,12 @@ app.use((req, res, next) => {
 (async () => {
   await registerRoutes(httpServer, app);
 
+  // ✅ ROOT TEST ROUTE (THIS FIXES YOUR ISSUE)
+  app.get("/", (_req, res) => {
+    res.send("HULinks server is running 🚀");
+  });
+
+  // 🔥 ERROR HANDLER
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -107,9 +116,7 @@ app.use((req, res, next) => {
     return res.status(status).json({ message });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // 🔥 STATIC / VITE
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
@@ -117,19 +124,16 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-const port = parseInt(process.env.PORT || "5000", 10);
+  // 🔥 SERVER START
+  const port = parseInt(process.env.PORT || "5000", 10);
 
-httpServer.listen(
-  {
-    port,
-    host: "0.0.0.0",
-  },
-  () => {
-    console.log(`Server running on port ${port}`);
-  }
-);
+  httpServer.listen(
+    {
+      port,
+      host: "0.0.0.0",
+    },
+    () => {
+      console.log(`Server running on port ${port}`);
+    },
+  );
 })();
