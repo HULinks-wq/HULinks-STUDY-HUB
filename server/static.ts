@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// fix __dirname (ESM)
+// fix __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -18,8 +18,8 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // ✅ FIXED ROUTE (NO MORE "*", NO MORE CRASH)
-  app.get("/:path(*)", (_req, res) => {
+  // ✅ SAFEST VERSION (NO EXPRESS 5 BUGS)
+  app.use((req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
