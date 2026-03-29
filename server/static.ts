@@ -3,10 +3,11 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-export function serveStatic(app: Express) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
+// fix __dirname (ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
 
   if (!fs.existsSync(distPath)) {
@@ -17,7 +18,8 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-app.use((req, res) => {
-  res.sendFile(path.resolve(distPath, "index.html"));
-});
+  // ✅ FIXED ROUTE (NO MORE "*", NO MORE CRASH)
+  app.get("/:path(*)", (_req, res) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
 }
