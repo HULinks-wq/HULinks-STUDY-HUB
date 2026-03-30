@@ -77,6 +77,9 @@ function userId(req: any): string {
 }
 
 async function seedDatabase() {
+  // 🔴 SEEDING DISABLED
+  return;
+}
   const courses = await storage.getCourses();
   if (courses.length === 0) {
     await storage.createCourse({ name: "Computer Science 101", modules: ["Introduction to Programming", "Data Structures", "Algorithms"] });
