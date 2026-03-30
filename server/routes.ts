@@ -1380,6 +1380,5 @@ IMPORTANT: Only provide URLs in the exact formats above. Use real YouTube channe
     }
   });
 
-  seedDatabase().catch(console.error);
-  return httpServer;
-}
+// 🔴 SEEDING DISABLED
+// seedDatabase().catch(console.error);
