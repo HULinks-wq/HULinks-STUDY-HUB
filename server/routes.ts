@@ -77,9 +77,7 @@ function userId(req: any): string {
 }
 
 async function seedDatabase() {
-  // 🔴 SEEDING DISABLED
-  return;
-}
+  try {
   const courses = await storage.getCourses();
   if (courses.length === 0) {
     await storage.createCourse({ name: "Computer Science 101", modules: ["Introduction to Programming", "Data Structures", "Algorithms"] });
@@ -1383,5 +1381,7 @@ IMPORTANT: Only provide URLs in the exact formats above. Use real YouTube channe
     }
   });
 
-// 🔴 SEEDING DISABLED
-// seedDatabase().catch(console.error);
+  }
+} catch (e) {
+  console.log("Seeding skipped (DB not ready)");
+}
