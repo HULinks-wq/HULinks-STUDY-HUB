@@ -43,3 +43,59 @@ router.post("/study-buddy", async (req, res) => {
 
 // ✅ IMPORTANT EXPORT
 export const ai = router;
+
+router.post("/generate-quiz", async (req, res) => {
+  try {
+    console.log("🔥 Quiz generator hit");
+
+    const { topic, module, level, questions } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ message: "Topic is required" });
+    }
+
+    const prompt = `
+You are a university tutor.
+
+Create a ${level || "medium"} difficulty quiz for the module "${module || "General"}" on the topic "${topic}".
+
+Requirements:
+- Generate ${questions || 5} questions
+- Mix multiple choice and short answer questions
+- After the quiz, provide a MEMO (answers)
+- Keep it clean and structured
+
+Format:
+
+QUIZ:
+1. Question...
+A) ...
+B) ...
+C) ...
+D) ...
+
+2. Question...
+
+MEMO:
+1. Answer...
+2. Answer...
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    res.json({
+      quiz: response.choices[0].message.content,
+    });
+
+  } catch (error) {
+    console.error("❌ QUIZ ERROR:", error);
+
+    res.status(500).json({
+      message: "Quiz generation failed",
+      error: error.message,
+    });
+  }
+});
