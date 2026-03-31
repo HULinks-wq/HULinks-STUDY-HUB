@@ -53,6 +53,7 @@ router.post("/generate-quiz", async (req, res) => {
     if (!topic) {
       return res.status(400).json({ message: "Topic is required" });
     }
+    
    const prompt = `
 You are a university tutor.
 
