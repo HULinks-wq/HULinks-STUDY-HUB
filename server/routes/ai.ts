@@ -54,48 +54,33 @@ router.post("/generate-quiz", async (req, res) => {
       return res.status(400).json({ message: "Topic is required" });
     }
 
-    const prompt = `
+   const prompt = `
 You are a university tutor.
 
-Create a ${level || "medium"} difficulty quiz for the module "${module || "General"}" on the topic "${topic}".
+Create a ${level || "medium"} quiz for "${module || "General"}" on "${topic}".
 
-Requirements:
-- Generate ${questions || 5} questions
-- Mix multiple choice and short answer questions
-- After the quiz, provide a MEMO (answers)
-- Keep it clean and structured
+Return ONLY JSON (no extra text).
 
 Format:
 
-QUIZ:
-1. Question...
-A) ...
-B) ...
-C) ...
-D) ...
+{
+  "quiz": [
+    {
+      "question": "Question text",
+      "type": "mcq",
+      "options": ["A", "B", "C", "D"],
+      "answer": "Correct answer"
+    },
+    {
+      "question": "Question text",
+      "type": "short",
+      "answer": "Answer"
+    }
+  ]
+}
 
-2. Question...
-
-MEMO:
-1. Answer...
-2. Answer...
+Rules:
+- ${questions || 5} questions
+- Mix mcq and short
+- Keep answers accurate
 `;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    res.json({
-      quiz: response.choices[0].message.content,
-    });
-
-  } catch (error) {
-    console.error("❌ QUIZ ERROR:", error);
-
-    res.status(500).json({
-      message: "Quiz generation failed",
-      error: error.message,
-    });
-  }
-});
