@@ -4,10 +4,8 @@
   "type": "module",
   "license": "MIT",
 "scripts": {
-  "dev": "NODE_ENV=development tsx server/index.ts",
-  "build": "vite build",
-  "start": "npm run build && NODE_ENV=production tsx server/index.ts"
-},
+  "start": "npx tsx server/index.ts"
+}
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
