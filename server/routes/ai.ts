@@ -20,6 +20,8 @@ router.post("/study-buddy", async (req, res) => {
       return res.status(400).json({ message: "Message is required" });
     }
 
+console.log("🚀 NEW CODE DEPLOYED");
+
 const response = await openai.chat.completions.create({
   model: "gpt-4o-mini",
   messages: [{ role: "user", content: prompt }],
