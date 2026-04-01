@@ -27,10 +27,21 @@ router.post("/study-buddy", async (req, res) => {
       ],
     });
 
-    res.json({
-      reply: response.choices[0].message.content,
-    });
+const raw = response.choices[0].message.content;
 
+let parsed;
+
+try {
+  parsed = JSON.parse(raw);
+} catch (err) {
+  console.error("❌ JSON PARSE ERROR:", raw);
+  return res.status(500).json({
+    message: "AI did not return valid JSON",
+    raw,
+  });
+}
+
+res.json(parsed);
   } catch (error) {
     console.error("❌ AI ERROR:", error);
 
@@ -54,22 +65,26 @@ router.post("/generate-quiz", async (req, res) => {
       return res.status(400).json({ message: "Topic is required" });
     }
     
-   const prompt = `
+  const prompt = `
 You are a university tutor.
 
 Create a ${level || "medium"} quiz for "${module || "General"}" on "${topic}".
 
-Return ONLY JSON (no extra text).
+IMPORTANT:
+- You MUST return ONLY valid JSON
+- DO NOT include explanations, titles, or formatting text
+- DO NOT include "QUIZ" or "MEMO"
+- ONLY return JSON
 
-Format:
+Format EXACTLY like this:
 
 {
   "quiz": [
     {
       "question": "Question text",
       "type": "mcq",
-      "options": ["A", "B", "C", "D"],
-      "answer": "Correct answer"
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answer": "Correct option"
     },
     {
       "question": "Question text",
@@ -81,6 +96,6 @@ Format:
 
 Rules:
 - ${questions || 5} questions
-- Mix mcq and short
-- Keep answers accurate
+- Mix MCQ and short answer
+- Answers must be correct
 `;
