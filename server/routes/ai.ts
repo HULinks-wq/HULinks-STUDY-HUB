@@ -1,58 +1,33 @@
-import express from "express";
-import OpenAI from "openai";
+import { Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+router.get("/api/ai", (req, res) => {
+  res.json({
+    quiz: [
+      {
+        question: "What is working capital?",
+        options: [
+          "A company's profit",
+          "Current assets minus current liabilities",
+          "Total revenue",
+          "Long-term debt",
+        ],
+        answer: "B",
+      },
+      {
+        question: "Which is a current asset?",
+        options: [
+          "Buildings",
+          "Machinery",
+          "Inventory",
+          "Land",
+        ],
+        answer: "C",
+      },
+    ],
+    memo: "Working capital = Current Assets - Current Liabilities.",
+  });
 });
 
-// POST /api/ai/study-buddy
-router.post("/study-buddy", async (req, res) => {
-  try {
-    console.log("🔥 Study buddy hit");
-
-    const { message } = req.body;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `
-You are a study assistant.
-
-When generating quizzes:
-- ALWAYS return JSON
-- Format:
-{
-  "quiz": "...",
-  "memo": "..."
-}
-
-Do NOT return explanations outside JSON.
-          `,
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
-
-    const raw = response.choices[0].message.content;
-
-    try {
-      const parsed = JSON.parse(raw);
-      res.json(parsed);
-    } catch {
-      res.json({ reply: raw });
-    }
-
-  } catch (e) {
-    console.error("❌ AI ERROR:", e);
-    res.status(500).json({ message: "Study buddy failed" });
-  }
-});
-
-export const ai = router;
+export default router;
