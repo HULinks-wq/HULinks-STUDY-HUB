@@ -1,11 +1,8 @@
-import { Express } from "express";
+import { Router } from "express";
+import ai from "./ai";
 
-import health from "./health";
-import { ai } from "./ai";
-import uploads from "./uploads";
+const router = Router();
 
-export function registerRoutes(app: Express) {
-  app.use("/api/health", health);
-  app.use("/api/ai", ai);
-  app.use("/api/uploads", uploads);
-}
+router.use(ai);
+
+export default router;

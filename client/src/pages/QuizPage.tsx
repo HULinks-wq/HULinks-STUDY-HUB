@@ -10,8 +10,7 @@ export default function QuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-
-  // 🔥 THIS IS WHERE YOUR BACKEND CONNECTS
+  
   useEffect(() => {
     fetch("https://hulinks-study-hub.up.railway.app/api/ai")
       .then(res => res.json())
