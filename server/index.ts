@@ -5,8 +5,13 @@ const app = express();
 
 app.use(express.json());
 
+// ROOT (optional but good)
 app.get("/", (req, res) => {
   res.send("API is running");
+});
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
 });
 
 app.use(routes);
