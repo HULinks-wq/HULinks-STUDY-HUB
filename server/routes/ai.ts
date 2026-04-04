@@ -17,12 +17,19 @@ router.get("/api/ai", async (req, res) => {
           content: `
 Generate 3 multiple choice quiz questions about business studies.
 
-Return ONLY JSON in this format:
+STRICT RULES:
+- Each question must have EXACTLY 4 options
+- Do NOT include "A:", "B:", etc in the options
+- Options must be plain text only
+- The answer must be ONLY one letter: A, B, C, or D
+
+Return ONLY valid JSON in this exact format:
+
 {
   "quiz": [
     {
-      "question": "...",
-      "options": ["A", "B", "C", "D"],
+      "question": "What is ...?",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
       "answer": "A"
     }
   ],
@@ -33,15 +40,16 @@ Return ONLY JSON in this format:
       ],
     });
 
-    const text = completion.choices[0].message.content;
+    let text = completion.choices[0].message.content || "";
 
-    // convert string → JSON
-    const data = JSON.parse(text || "{}");
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    const data = JSON.parse(text);
 
     res.json(data);
 
   } catch (error) {
-    console.error(error);
+    console.error("AI ERROR:", error);
     res.status(500).json({ error: "AI failed" });
   }
 });
