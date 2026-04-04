@@ -1,33 +1,49 @@
 import { Router } from "express";
+import OpenAI from "openai";
 
 const router = Router();
 
-router.get("/api/ai", (req, res) => {
-  res.json({
-    quiz: [
-      {
-        question: "What is working capital?",
-        options: [
-          "A company's profit",
-          "Current assets minus current liabilities",
-          "Total revenue",
-          "Long-term debt",
-        ],
-        answer: "B",
-      },
-      {
-        question: "Which is a current asset?",
-        options: [
-          "Buildings",
-          "Machinery",
-          "Inventory",
-          "Land",
-        ],
-        answer: "C",
-      },
-    ],
-    memo: "Working capital = Current Assets - Current Liabilities.",
-  });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+router.get("/api/ai", async (req, res) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: `
+Generate 3 multiple choice quiz questions about business studies.
+
+Return ONLY JSON in this format:
+{
+  "quiz": [
+    {
+      "question": "...",
+      "options": ["A", "B", "C", "D"],
+      "answer": "A"
+    }
+  ],
+  "memo": "short explanation"
+}
+          `,
+        },
+      ],
+    });
+
+    const text = completion.choices[0].message.content;
+
+    // convert string → JSON
+    const data = JSON.parse(text || "{}");
+
+    res.json(data);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "AI failed" });
+  }
 });
 
 export default router;
