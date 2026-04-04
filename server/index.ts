@@ -5,10 +5,14 @@ import routes from "./routes";
 const app = express();
 
 app.use(cors({
-  origin: "*", // allow all (for now)
+  origin: "*",
 }));
 
 app.use(express.json());
+
+app.get("/api/health", (req, res) => {
+  res.send("OK");
+});
 
 app.use(routes);
 
