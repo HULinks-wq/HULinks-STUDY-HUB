@@ -1,23 +1,16 @@
 import express from "express";
+import cors from "cors";
 import routes from "./routes";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-
-// ROOT (optional but good)
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
-
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "OK" });
-});
 
 app.use(routes);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });

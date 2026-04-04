@@ -10,34 +10,60 @@ export default function QuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-  
-  useEffect(() => {
-    fetch("https://hulinks-study-hub.up.railway.app/api/ai")
-      .then(res => res.json())
-      .then(data => {
-        console.log("API RESULT:", data); // for debugging
+  const [loading, setLoading] = useState(false);
+
+  const fetchQuiz = async () => {
+    setLoading(true);
+
+    try {
+      const res = await fetch("https://hulinks-study-hub.up.railway.app/api/ai");
+      const data = await res.json();
+
+      console.log("API RESULT:", data);
+
+      if (data && data.quiz) {
         setQuestions(data.quiz);
-      })
-      .catch(err => console.error(err));
+        setCurrent(0);
+        setScore(0);
+      } else {
+        console.error("Invalid API response:", data);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchQuiz();
   }, []);
 
   const handleAnswer = (index: number) => {
     const correct = questions[current].answer;
 
     if (String.fromCharCode(65 + index) === correct) {
-      setScore(score + 1);
+      setScore((prev) => prev + 1);
     }
 
-    setCurrent(current + 1);
+    setCurrent((prev) => prev + 1);
   };
 
-  if (questions.length === 0) return <p>Loading...</p>;
+  if (loading) return <h1>Loading AI Quiz... 🤖</h1>;
+
+  if (!loading && questions.length === 0) {
+    return <p>Failed to load quiz ❌</p>;
+  }
 
   if (current >= questions.length) {
     return (
       <div>
         <h1>Quiz Finished 🎉</h1>
         <p>Your score: {score}</p>
+
+        <button onClick={fetchQuiz}>
+          Generate New Quiz 🔥
+        </button>
       </div>
     );
   }
@@ -51,6 +77,12 @@ export default function QuizPage() {
           {opt}
         </button>
       ))}
+
+      <br /><br />
+
+      <button onClick={fetchQuiz}>
+        New Quiz 🔁
+      </button>
     </div>
   );
 }
